@@ -1,4 +1,5 @@
-// Cloudflare Function to handle email submissions and store in Google Sheets
+import { GoogleSpreadsheet } from "google-spreadsheet"
+import { JWT } from "google-auth-library"
 
 export async function onRequest(context) {
   // Handle CORS preflight requests
@@ -52,14 +53,15 @@ export async function onRequest(context) {
     }
 
     // Get environment variables
-    const { GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY, GOOGLE_SHEET_ID } = context.env
+    const clientEmail = context.env.GOOGLE_CLIENT_EMAIL
+    const privateKey = context.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
+    const sheetId = context.env.GOOGLE_SHEET_ID
 
-    if (!GOOGLE_CLIENT_EMAIL || !GOOGLE_PRIVATE_KEY || !GOOGLE_SHEET_ID) {
-      console.error("Missing required environment variables")
+    if (!clientEmail || !privateKey || !sheetId) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "Server configuration error. Please contact the administrator.",
+          message: "Server configuration error",
         }),
         {
           status: 500,
@@ -71,32 +73,27 @@ export async function onRequest(context) {
       )
     }
 
-    // Get current timestamp
-    const timestamp = new Date().toISOString()
+    // Create a JWT client using the service account credentials
+    const serviceAccountAuth = new JWT({
+      email: clientEmail,
+      key: privateKey,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    })
 
-    // Prepare the request to Google Sheets API
-    const token = await getGoogleAuthToken(GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY)
+    // Initialize the Google Spreadsheet with the document ID
+    const doc = new GoogleSpreadsheet(sheetId, serviceAccountAuth)
 
-    // Append the data to the Google Sheet
-    const appendResponse = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/Sheet1!A:B:append?valueInputOption=USER_ENTERED`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          values: [[email, timestamp]],
-        }),
-      },
-    )
+    // Load document properties and sheets
+    await doc.loadInfo()
 
-    if (!appendResponse.ok) {
-      const errorData = await appendResponse.text()
-      console.error("Google Sheets API error:", errorData)
-      throw new Error("Failed to store email in Google Sheets")
-    }
+    // Get the first sheet
+    const sheet = doc.sheetsByIndex[0]
+
+    // Add a new row with the email and timestamp
+    await sheet.addRow({
+      email,
+      timestamp: new Date().toISOString(),
+    })
 
     return new Response(
       JSON.stringify({
@@ -128,43 +125,5 @@ export async function onRequest(context) {
       },
     )
   }
-}
-
-// Function to get Google Auth token
-async function getGoogleAuthToken(clientEmail, privateKey) {
-  // Create JWT for Google authentication
-  const now = Math.floor(Date.now() / 1000)
-  const exp = now + 3600 // Token expires in 1 hour
-
-  const header = {
-    alg: "RS256",
-    typ: "JWT",
-  }
-
-  const payload = {
-    iss: clientEmail,
-    scope: "https://www.googleapis.com/auth/spreadsheets",
-    aud: "https://oauth2.googleapis.com/token",
-    exp: exp,
-    iat: now,
-  }
-
-  // Base64 encode the header and payload
-  const encodedHeader = btoa(JSON.stringify(header)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-  const encodedPayload = btoa(JSON.stringify(payload)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-
-  // Create the JWT signature using the private key
-  // Note: This is a simplified version. In a real implementation, you would use a proper JWT library
-  // For Cloudflare Workers, you might need to use the SubtleCrypto API
-
-  // Since we can't implement the full JWT signing in this example,
-  // we'll use a placeholder and provide instructions for a complete implementation
-
-  // For a real implementation, you would:
-  // 1. Use the Web Crypto API to sign the JWT
-  // 2. Or use a JWT library compatible with Cloudflare Workers
-
-  // For now, we'll return a placeholder
-  return "PLACEHOLDER_TOKEN"
 }
 
