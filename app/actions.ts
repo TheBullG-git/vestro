@@ -1,6 +1,6 @@
 "use server"
 
-import { addSubscriberToSheet } from "@/lib/google-sheets"
+import { saveEmail } from "@/lib/email-service"
 
 export async function subscribeToWaitlist(formData: FormData) {
   const email = formData.get("email") as string
@@ -13,8 +13,8 @@ export async function subscribeToWaitlist(formData: FormData) {
   }
 
   try {
-    // Add the subscriber to Google Sheets
-    await addSubscriberToSheet(email)
+    // Save the email using our simplified service
+    const result = await saveEmail(email)
 
     return {
       success: true,

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { saveEmail } from "@/lib/email-service"
 
 export async function POST(request: Request) {
   try {
@@ -9,11 +10,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Invalid email address" }, { status: 400 })
     }
 
-    // Log the email for now
-    console.log("Email submitted:", email)
+    // Save the email
+    await saveEmail(email)
 
-    // In a production environment, you would connect to Google Sheets here
-    // For now, we'll just return a success message
+    // Return success response
     return NextResponse.json({
       success: true,
       message: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
