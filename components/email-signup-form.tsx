@@ -31,28 +31,46 @@ export function EmailSignupForm() {
     setIsSubmitting(true)
 
     try {
-      // For now, we'll just simulate a successful submission
-      // This ensures the form works even without the API endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Send the email to our API endpoint
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      })
 
-      // Store the email in localStorage for demonstration purposes
-      const emails = JSON.parse(localStorage.getItem("vestrocloud_emails") || "[]")
-      emails.push({ email, timestamp: new Date().toISOString() })
-      localStorage.setItem("vestrocloud_emails", JSON.stringify(emails))
+      const data = await response.json()
 
-      console.log("Email stored locally:", email)
-      console.log("All stored emails:", emails)
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong")
+      }
 
       setMessage({
-        text: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
+        text: data.message || "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
         type: "success",
       })
       setEmail("")
     } catch (error) {
-      setMessage({
-        text: error instanceof Error ? error.message : "Please try again later.",
-        type: "error",
-      })
+      console.error("Error submitting email:", error)
+
+      // Fallback to localStorage if the API fails
+      try {
+        const emails = JSON.parse(localStorage.getItem("vestrocloud_emails") || "[]")
+        emails.push({ email, timestamp: new Date().toISOString() })
+        localStorage.setItem("vestrocloud_emails", JSON.stringify(emails))
+
+        setMessage({
+          text: "Thank you for joining our exclusive waitlist! We'll be in touch soon. (Saved locally)",
+          type: "success",
+        })
+        setEmail("")
+      } catch (localError) {
+        setMessage({
+          text: error instanceof Error ? error.message : "Please try again later.",
+          type: "error",
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }
