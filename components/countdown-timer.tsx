@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react"
 
 interface CountdownTimerProps {
-  targetDate: string
+  targetDate?: string
+  daysFromNow?: number
 }
 
-export function CountdownTimer({ targetDate }: CountdownTimerProps) {
+export function CountdownTimer({ targetDate, daysFromNow = 30 }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -15,7 +16,19 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   })
 
   useEffect(() => {
-    const target = new Date(targetDate).getTime()
+    // Calculate target date: either use provided date or calculate from daysFromNow
+    let target: number
+
+    if (targetDate) {
+      // Use the specific date if provided
+      target = new Date(targetDate).getTime()
+    } else {
+      // Calculate a date that is X days from now
+      const now = new Date()
+      const futureDate = new Date(now)
+      futureDate.setDate(now.getDate() + daysFromNow)
+      target = futureDate.getTime()
+    }
 
     const interval = setInterval(() => {
       const now = new Date().getTime()
@@ -36,7 +49,7 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [targetDate])
+  }, [targetDate, daysFromNow])
 
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
@@ -64,3 +77,4 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
   )
 }
 
+  
