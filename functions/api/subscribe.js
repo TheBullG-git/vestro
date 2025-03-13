@@ -52,6 +52,24 @@ export async function onRequest(context) {
     // Log the email for now
     console.log("Email submitted:", email)
 
+    // Store the email in Cloudflare KV (if available)
+    try {
+      if (context.env.EMAILS) {
+        const key = `email:${Date.now()}`
+        await context.env.EMAILS.put(
+          key,
+          JSON.stringify({
+            email,
+            timestamp: new Date().toISOString(),
+          }),
+        )
+        console.log(`Email stored in KV with key: ${key}`)
+      }
+    } catch (kvError) {
+      console.error("Error storing in KV:", kvError)
+      // Continue even if KV storage fails
+    }
+
     // Return success response
     return new Response(
       JSON.stringify({
