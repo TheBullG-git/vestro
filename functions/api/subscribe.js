@@ -1,6 +1,3 @@
-import { GoogleSpreadsheet } from "google-spreadsheet"
-import { JWT } from "google-auth-library"
-
 export async function onRequest(context) {
   // Handle CORS preflight requests
   if (context.request.method === "OPTIONS") {
@@ -52,48 +49,12 @@ export async function onRequest(context) {
       )
     }
 
-    // Get environment variables
-    const clientEmail = context.env.GOOGLE_CLIENT_EMAIL
-    const privateKey = context.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n")
-    const sheetId = context.env.GOOGLE_SHEET_ID
+    // In a real implementation, you would store the email in a database or send it to a service
+    // For now, we'll just log it and return success
+    console.log("Email submitted:", email)
 
-    if (!clientEmail || !privateKey || !sheetId) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "Server configuration error",
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        },
-      )
-    }
-
-    // Create a JWT client using the service account credentials
-    const serviceAccountAuth = new JWT({
-      email: clientEmail,
-      key: privateKey,
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    })
-
-    // Initialize the Google Spreadsheet with the document ID
-    const doc = new GoogleSpreadsheet(sheetId, serviceAccountAuth)
-
-    // Load document properties and sheets
-    await doc.loadInfo()
-
-    // Get the first sheet
-    const sheet = doc.sheetsByIndex[0]
-
-    // Add a new row with the email and timestamp
-    await sheet.addRow({
-      email,
-      timestamp: new Date().toISOString(),
-    })
+    // You could add code here to store the email in a database or send it to a service
+    // For example, using Cloudflare D1, KV, or a third-party service
 
     return new Response(
       JSON.stringify({
