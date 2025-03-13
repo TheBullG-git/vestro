@@ -15,17 +15,38 @@ export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
   })
 
   useEffect(() => {
-    // Calculate a date that is X days from now
-    const now = new Date()
-    const futureDate = new Date(now)
-    futureDate.setDate(now.getDate() + days)
-    const target = futureDate.getTime()
+    // Get the target date from localStorage or create a new one
+    let targetTimestamp: number
+
+    if (typeof window !== "undefined") {
+      const savedTarget = localStorage.getItem("countdownTarget")
+
+      if (savedTarget) {
+        // Use the saved target date
+        targetTimestamp = Number.parseInt(savedTarget, 10)
+      } else {
+        // Calculate a new target date (30 days from now)
+        const now = new Date()
+        const futureDate = new Date(now)
+        futureDate.setDate(now.getDate() + days)
+        targetTimestamp = futureDate.getTime()
+
+        // Save it to localStorage for future visits
+        localStorage.setItem("countdownTarget", targetTimestamp.toString())
+      }
+    } else {
+      // Fallback for SSR
+      const now = new Date()
+      const futureDate = new Date(now)
+      futureDate.setDate(now.getDate() + days)
+      targetTimestamp = futureDate.getTime()
+    }
 
     // Initial calculation
-    calculateTimeLeft(target)
+    calculateTimeLeft(targetTimestamp)
 
     const interval = setInterval(() => {
-      calculateTimeLeft(target)
+      calculateTimeLeft(targetTimestamp)
     }, 1000)
 
     function calculateTimeLeft(targetTime: number) {
@@ -35,6 +56,11 @@ export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
       if (difference <= 0) {
         clearInterval(interval)
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+        // If countdown is finished, clear localStorage
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("countdownTarget")
+        }
         return
       }
 
