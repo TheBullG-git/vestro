@@ -49,25 +49,30 @@ export async function onRequest(context) {
       )
     }
 
-    // Log the email for now
+    // Log the email for debugging
     console.log("Email submitted:", email)
 
-    // Store the email in Cloudflare KV (if available)
+    // Send the email to Google Sheets via Google Apps Script
     try {
-      if (context.env.EMAILS) {
-        const key = `email:${Date.now()}`
-        await context.env.EMAILS.put(
-          key,
-          JSON.stringify({
-            email,
-            timestamp: new Date().toISOString(),
-          }),
-        )
-        console.log(`Email stored in KV with key: ${key}`)
+      const GOOGLE_SCRIPT_URL = context.env.GOOGLE_SCRIPT_URL || ""
+
+      if (GOOGLE_SCRIPT_URL) {
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, timestamp: new Date().toISOString() }),
+        })
+
+        const result = await response.json()
+        console.log("Google Apps Script response:", result)
+      } else {
+        console.warn("GOOGLE_SCRIPT_URL environment variable not set")
       }
-    } catch (kvError) {
-      console.error("Error storing in KV:", kvError)
-      // Continue even if KV storage fails
+    } catch (apiError) {
+      console.error("Error sending to Google Apps Script:", apiError)
+      // Continue even if API call fails
     }
 
     // Return success response
