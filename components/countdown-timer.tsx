@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react"
 
 interface CountdownTimerProps {
-  days?: number
+  targetDate?: string
 }
 
-export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
+export function CountdownTimer({ targetDate = "2025-04-13T00:00:00" }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -15,52 +15,24 @@ export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
   })
 
   useEffect(() => {
-    // Get the target date from localStorage or create a new one
-    let targetTimestamp: number
+    // Parse the target date
+    const target = new Date(targetDate).getTime()
 
-    if (typeof window !== "undefined") {
-      const savedTarget = localStorage.getItem("countdownTarget")
-
-      if (savedTarget) {
-        // Use the saved target date
-        targetTimestamp = Number.parseInt(savedTarget, 10)
-      } else {
-        // Calculate a new target date (30 days from now)
-        const now = new Date()
-        const futureDate = new Date(now)
-        futureDate.setDate(now.getDate() + days)
-        targetTimestamp = futureDate.getTime()
-
-        // Save it to localStorage for future visits
-        localStorage.setItem("countdownTarget", targetTimestamp.toString())
-      }
-    } else {
-      // Fallback for SSR
-      const now = new Date()
-      const futureDate = new Date(now)
-      futureDate.setDate(now.getDate() + days)
-      targetTimestamp = futureDate.getTime()
-    }
+    // Log the target date for verification
+    console.log("Countdown target date:", new Date(target).toLocaleString())
 
     // Initial calculation
-    calculateTimeLeft(targetTimestamp)
+    calculateTimeLeft()
 
-    const interval = setInterval(() => {
-      calculateTimeLeft(targetTimestamp)
-    }, 1000)
+    const interval = setInterval(calculateTimeLeft, 1000)
 
-    function calculateTimeLeft(targetTime: number) {
+    function calculateTimeLeft() {
       const now = new Date().getTime()
-      const difference = targetTime - now
+      const difference = target - now
 
       if (difference <= 0) {
         clearInterval(interval)
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 })
-
-        // If countdown is finished, clear localStorage
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("countdownTarget")
-        }
         return
       }
 
@@ -73,7 +45,7 @@ export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
     }
 
     return () => clearInterval(interval)
-  }, [days]) // Only re-run if days prop changes
+  }, [targetDate])
 
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
