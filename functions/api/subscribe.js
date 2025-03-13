@@ -49,13 +49,10 @@ export async function onRequest(context) {
       )
     }
 
-    // In a real implementation, you would store the email in a database or send it to a service
-    // For now, we'll just log it and return success
+    // Log the email for now
     console.log("Email submitted:", email)
 
-    // You could add code here to store the email in a database or send it to a service
-    // For example, using Cloudflare D1, KV, or a third-party service
-
+    // Return success response
     return new Response(
       JSON.stringify({
         success: true,
