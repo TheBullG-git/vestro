@@ -105,7 +105,7 @@ export default function Home() {
 
               <div className="w-full max-w-md">
                 <p className="text-amber-200 mb-2 italic">Reserve your exclusive position</p>
-                <CountdownTimer daysFromNow={30} />
+                <CountdownTimer days={30} />
               </div>
 
               <div className="w-full max-w-md relative">

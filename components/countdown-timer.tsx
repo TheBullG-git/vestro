@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react"
 
 interface CountdownTimerProps {
-  targetDate?: string
-  daysFromNow?: number
+  days?: number
 }
 
-export function CountdownTimer({ targetDate, daysFromNow = 30 }: CountdownTimerProps) {
+export function CountdownTimer({ days = 30 }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -16,23 +15,22 @@ export function CountdownTimer({ targetDate, daysFromNow = 30 }: CountdownTimerP
   })
 
   useEffect(() => {
-    // Calculate target date: either use provided date or calculate from daysFromNow
-    let target: number
+    // Calculate a date that is X days from now
+    const now = new Date()
+    const futureDate = new Date(now)
+    futureDate.setDate(now.getDate() + days)
+    const target = futureDate.getTime()
 
-    if (targetDate) {
-      // Use the specific date if provided
-      target = new Date(targetDate).getTime()
-    } else {
-      // Calculate a date that is X days from now
-      const now = new Date()
-      const futureDate = new Date(now)
-      futureDate.setDate(now.getDate() + daysFromNow)
-      target = futureDate.getTime()
-    }
+    // Initial calculation
+    calculateTimeLeft(target)
 
     const interval = setInterval(() => {
+      calculateTimeLeft(target)
+    }, 1000)
+
+    function calculateTimeLeft(targetTime: number) {
       const now = new Date().getTime()
-      const difference = target - now
+      const difference = targetTime - now
 
       if (difference <= 0) {
         clearInterval(interval)
@@ -46,10 +44,10 @@ export function CountdownTimer({ targetDate, daysFromNow = 30 }: CountdownTimerP
       const seconds = Math.floor((difference % (1000 * 60)) / 1000)
 
       setTimeLeft({ days, hours, minutes, seconds })
-    }, 1000)
+    }
 
     return () => clearInterval(interval)
-  }, [targetDate, daysFromNow])
+  }, [days]) // Only re-run if days prop changes
 
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
@@ -77,4 +75,3 @@ export function CountdownTimer({ targetDate, daysFromNow = 30 }: CountdownTimerP
   )
 }
 
-  
