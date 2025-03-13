@@ -7,21 +7,12 @@ import { motion } from "framer-motion"
 
 interface ScrollRevealProps {
   children: React.ReactNode
-  animation?: "fade-up" | "fade-down" | "fade-left" | "fade-right" | "zoom-in" | "zoom-out" | "flip"
+  direction?: "up" | "down" | "left" | "right"
   delay?: number
-  duration?: number
-  threshold?: number
   className?: string
 }
 
-export function ScrollReveal({
-  children,
-  animation = "fade-up",
-  delay = 0,
-  duration = 0.5,
-  threshold = 0.1,
-  className = "",
-}: ScrollRevealProps) {
+export function ScrollReveal({ children, direction = "up", delay = 0, className = "" }: ScrollRevealProps) {
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -34,41 +25,33 @@ export function ScrollReveal({
         }
       },
       {
-        threshold,
-        rootMargin: "0px 0px -100px 0px",
+        threshold: 0.1,
       },
     )
 
-    const currentRef = ref.current
-
-    if (currentRef) {
-      observer.observe(currentRef)
+    if (ref.current) {
+      observer.observe(ref.current)
     }
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
+      if (ref.current) {
+        observer.unobserve(ref.current)
       }
     }
-  }, [threshold])
+  }, [])
 
-  // Define animation variants
   const variants = {
     hidden: {
       opacity: 0,
-      y: animation === "fade-up" ? 50 : animation === "fade-down" ? -50 : 0,
-      x: animation === "fade-left" ? 50 : animation === "fade-right" ? -50 : 0,
-      scale: animation === "zoom-in" ? 0.8 : animation === "zoom-out" ? 1.2 : 1,
-      rotateX: animation === "flip" ? 90 : 0,
+      x: direction === "left" ? 50 : direction === "right" ? -50 : 0,
+      y: direction === "up" ? 50 : direction === "down" ? -50 : 0,
     },
     visible: {
       opacity: 1,
-      y: 0,
       x: 0,
-      scale: 1,
-      rotateX: 0,
+      y: 0,
       transition: {
-        duration,
+        duration: 0.6,
         delay,
         ease: "easeOut",
       },
