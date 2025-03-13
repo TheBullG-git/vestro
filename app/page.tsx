@@ -1,5 +1,5 @@
 import { Cloud, Crown, Diamond, Shield } from "lucide-react"
-import { CountdownTimer } from "@/components/countdown-timer"
+import CountdownTimer from "@/components/countdown-timer"
 import { EmailSignupForm } from "@/components/email-signup-form"
 import { StarField } from "@/components/star-field"
 import { FloatingIcons } from "@/components/floating-icons"
