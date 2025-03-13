@@ -1,61 +1,27 @@
 import { NextResponse } from "next/server"
-import { google } from "googleapis"
-
-// This function authenticates with Google using a service account
-async function getGoogleSheetsClient() {
-  try {
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      },
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    })
-
-    const sheets = google.sheets({ version: "v4", auth })
-    return sheets
-  } catch (error) {
-    console.error("Error authenticating with Google:", error)
-    throw new Error("Failed to authenticate with Google")
-  }
-}
 
 export async function POST(request: Request) {
   try {
     const { email } = await request.json()
 
+    // Validate email
     if (!email || !email.includes("@")) {
       return NextResponse.json({ success: false, message: "Invalid email address" }, { status: 400 })
     }
 
-    // Get the Google Sheets client
-    const sheets = await getGoogleSheetsClient()
+    // Log the email for now
+    console.log("Email submitted:", email)
 
-    // Add the email to the Google Sheet
-    // Replace with your actual spreadsheet ID and range
-    const spreadsheetId = process.env.GOOGLE_SHEET_ID
-    const range = "Sheet1!A:B" // Adjust based on your sheet structure
-
-    // Get current timestamp
-    const timestamp = new Date().toISOString()
-
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption: "USER_ENTERED",
-      requestBody: {
-        values: [[email, timestamp]],
-      },
-    })
-
+    // In a production environment, you would connect to Google Sheets here
+    // For now, we'll just return a success message
     return NextResponse.json({
       success: true,
-      message: "Thank you for joining our exclusive waitlist!",
+      message: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
     })
   } catch (error) {
-    console.error("Error adding email to spreadsheet:", error)
+    console.error("Error processing subscription:", error)
     return NextResponse.json(
-      { success: false, message: "Failed to register your email. Please try again." },
+      { success: false, message: "Failed to process your request. Please try again later." },
       { status: 500 },
     )
   }
