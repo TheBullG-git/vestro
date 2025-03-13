@@ -46,6 +46,15 @@ export function EmailSignupForm() {
         throw new Error(data.message || "Something went wrong")
       }
 
+      // Also save to localStorage as a backup
+      try {
+        const emails = JSON.parse(localStorage.getItem("vestrocloud_emails") || "[]")
+        emails.push({ email, timestamp: new Date().toISOString() })
+        localStorage.setItem("vestrocloud_emails", JSON.stringify(emails))
+      } catch (e) {
+        console.error("Could not save to localStorage:", e)
+      }
+
       setMessage({
         text: data.message || "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
         type: "success",
@@ -61,7 +70,7 @@ export function EmailSignupForm() {
         localStorage.setItem("vestrocloud_emails", JSON.stringify(emails))
 
         setMessage({
-          text: "Thank you for joining our exclusive waitlist! We'll be in touch soon. (Saved locally)",
+          text: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
           type: "success",
         })
         setEmail("")
