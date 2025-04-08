@@ -3,8 +3,8 @@ import { NextResponse } from "next/server"
 // This makes the route static for export
 export const dynamic = "force-static"
 
-// This is needed for static export
-export const runtime = "edge"
+// Remove the runtime directive as it conflicts with force-static
+// export const runtime = "edge"
 
 export async function GET() {
   return NextResponse.json({
