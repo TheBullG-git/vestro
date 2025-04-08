@@ -1,7 +1,7 @@
 "use client"
 
 import { Server, Globe, GamepadIcon, Headphones, Calculator, HardDrive, Network } from "lucide-react"
-import { type ServicePackage, getServicePackages } from "@/lib/api-service"
+import type { ServicePackage } from "@/lib/api-service"
 
 // Map service categories to icons
 const getIconForService = (service: ServicePackage) => {
@@ -45,15 +45,12 @@ const getIconForService = (service: ServicePackage) => {
   }
 }
 
+// Import the fallback services directly to ensure we always have data
+import { getFallbackServices } from "@/lib/services-data"
+
 export async function ServicesGridServer() {
-  // Wrap in try/catch to ensure we always render something
-  let services: ServicePackage[] = []
-  try {
-    services = await getServicePackages()
-  } catch (error) {
-    console.error("Error fetching services:", error)
-    // Use an empty array if there's an error
-  }
+  // Use the fallback services directly to avoid any API calls
+  const services = getFallbackServices()
 
   return (
     <div className="py-12">
@@ -67,24 +64,16 @@ export async function ServicesGridServer() {
         </p>
       </div>
 
-      {services.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-white/70">
-            We're currently updating our service catalog. Please check back soon or contact us for more information.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {services.map((service) => (
-            <ServiceCard key={service.id} service={service} />
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {services.map((service) => (
+          <ServiceCard key={service.id} service={service} />
+        ))}
+      </div>
     </div>
   )
 }
+
 // Client component for interactive elements
-;("use client")
 function ServiceCard({ service }: { service: ServicePackage }) {
   return (
     <div
