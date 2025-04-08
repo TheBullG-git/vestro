@@ -26,7 +26,6 @@ export default function CancellationAndRefund() {
         <li>Log into your VestroCloud dashboard and select "Cancel Service" from the account menu</li>
         <li>Contact our support team via email at support@vestrocloud.com</li>
         <li>Contact our support team via live chat on our website</li>
-        <li>Call our customer service at +1 (800) 123-4567</li>
       </ul>
 
       <h3 className="text-lg font-semibold mt-6 mb-3 text-white">1.2 Service After Cancellation</h3>
