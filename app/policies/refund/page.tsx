@@ -102,7 +102,7 @@ export default function CancellationAndRefund() {
       <p className="mt-2">
         <strong>Email:</strong> billing@vestrocloud.com
         <br />
-        <strong>Phone:</strong> +1 (800) 123-4567
+
         <br />
         <strong>Address:</strong> Block No. B-1, Umiyaji Park, Kolki Road, Opp. New Police Line, Upleta Lati Plot,
         Upleta Police Station, Upleta, Gujarat
