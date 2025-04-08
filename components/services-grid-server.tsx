@@ -2,53 +2,75 @@
 
 import { Server, Globe, GamepadIcon, Headphones, Calculator, HardDrive, Network } from "lucide-react"
 import type { ServicePackage } from "@/lib/api-service"
-
-// Map service categories to icons
-const getIconForService = (service: ServicePackage) => {
-  const category = service.category.toLowerCase()
-
-  if (service.name.toLowerCase().includes("minecraft") || service.name.toLowerCase().includes("game")) {
-    return <GamepadIcon className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("teamspeak") || service.name.toLowerCase().includes("voice")) {
-    return <Headphones className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("vps")) {
-    return <Server className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("tally")) {
-    return <Calculator className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("backup")) {
-    return <HardDrive className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("colocation")) {
-    return <Network className="h-8 w-8 text-amber-300" />
-  }
-
-  if (service.name.toLowerCase().includes("web") || service.name.toLowerCase().includes("domain")) {
-    return <Globe className="h-8 w-8 text-amber-300" />
-  }
-
-  // Default icon based on category
-  if (category.includes("game")) {
-    return <GamepadIcon className="h-8 w-8 text-amber-300" />
-  } else if (category.includes("vps")) {
-    return <Server className="h-8 w-8 text-amber-300" />
-  } else {
-    return <Globe className="h-8 w-8 text-amber-300" />
-  }
-}
-
 // Import the fallback services directly to ensure we always have data
 import { getFallbackServices } from "@/lib/services-data"
 
-export async function ServicesGridServer() {
+// Client component for interactive elements
+function ServiceCard({ service }: { service: ServicePackage }) {
+  // Map service categories to icons
+  const getIconForService = (service: ServicePackage) => {
+    const category = service.category.toLowerCase()
+
+    if (service.name.toLowerCase().includes("minecraft") || service.name.toLowerCase().includes("game")) {
+      return <GamepadIcon className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("teamspeak") || service.name.toLowerCase().includes("voice")) {
+      return <Headphones className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("vps")) {
+      return <Server className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("tally")) {
+      return <Calculator className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("backup")) {
+      return <HardDrive className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("colocation")) {
+      return <Network className="h-8 w-8 text-amber-300" />
+    }
+
+    if (service.name.toLowerCase().includes("web") || service.name.toLowerCase().includes("domain")) {
+      return <Globe className="h-8 w-8 text-amber-300" />
+    }
+
+    // Default icon based on category
+    if (category.includes("game")) {
+      return <GamepadIcon className="h-8 w-8 text-amber-300" />
+    } else if (category.includes("vps")) {
+      return <Server className="h-8 w-8 text-amber-300" />
+    } else {
+      return <Globe className="h-8 w-8 text-amber-300" />
+    }
+  }
+
+  return (
+    <div
+      className="glass-card rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300 cursor-pointer"
+      onClick={() => window.open("https://billing.vestrocloud.com", "_blank")}
+    >
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600/30 flex items-center justify-center">
+        {getIconForService(service)}
+      </div>
+      <h3 className="text-xl font-semibold mb-3 text-white">{service.name}</h3>
+      <p className="text-white/70 mb-4">{service.description}</p>
+      {service.pricing ? (
+        <div className="text-amber-300 font-semibold">
+          {service.pricing.amount} {service.pricing.currency} / {service.pricing.period}
+        </div>
+      ) : (
+        <div className="text-amber-300 font-semibold">Pricing Coming Soon</div>
+      )}
+    </div>
+  )
+}
+
+export function ServicesGridServer() {
   // Use the fallback services directly to avoid any API calls
   const services = getFallbackServices()
 
@@ -69,29 +91,6 @@ export async function ServicesGridServer() {
           <ServiceCard key={service.id} service={service} />
         ))}
       </div>
-    </div>
-  )
-}
-
-// Client component for interactive elements
-function ServiceCard({ service }: { service: ServicePackage }) {
-  return (
-    <div
-      className="glass-card rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300 cursor-pointer"
-      onClick={() => window.open("https://billing.vestrocloud.com", "_blank")}
-    >
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600/30 flex items-center justify-center">
-        {getIconForService(service)}
-      </div>
-      <h3 className="text-xl font-semibold mb-3 text-white">{service.name}</h3>
-      <p className="text-white/70 mb-4">{service.description}</p>
-      {service.pricing ? (
-        <div className="text-amber-300 font-semibold">
-          {service.pricing.amount} {service.pricing.currency} / {service.pricing.period}
-        </div>
-      ) : (
-        <div className="text-amber-300 font-semibold">Pricing Coming Soon</div>
-      )}
     </div>
   )
 }
