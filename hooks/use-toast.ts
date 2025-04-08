@@ -51,4 +51,3 @@ export const useToast = () => {
 }
 
 export type { ToastProps, ToastActionElement }
-

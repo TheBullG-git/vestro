@@ -6,7 +6,8 @@ interface CountdownTimerProps {
   targetDate?: string
 }
 
-export default function CountdownTimer({ targetDate = "2025-04-13T00:00:00" }: CountdownTimerProps) {
+// Named export
+export function CountdownTimer({ targetDate = "2025-04-13T00:00:00" }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -73,3 +74,5 @@ export default function CountdownTimer({ targetDate = "2025-04-13T00:00:00" }: C
   )
 }
 
+// Default export (same component)
+export default CountdownTimer

@@ -70,4 +70,3 @@ export function ScrollReveal({ children, direction = "up", delay = 0, className 
     </motion.div>
   )
 }
-

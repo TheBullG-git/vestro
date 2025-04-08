@@ -1,12 +1,10 @@
 {
-    "name": "vestrocloud-functions",
-    "version": "1.0.0",
-    "description": "Cloudflare Functions for VestroCloud",
-    "main": "index.js",
-    "dependencies": {
-      "google-auth-library": "^9.0.0",
-      "google-spreadsheet": "^4.1.1"
-    }
+  "name": "vestrocloud-functions",
+  "version": "1.0.0",
+  "description": "Cloudflare Functions for VestroCloud",
+  "main": "index.js",
+  "dependencies": {
+    "google-auth-library": "^9.0.0",
+    "google-spreadsheet": "^4.1.1"
   }
-  
-  
+}

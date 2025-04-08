@@ -64,4 +64,3 @@ export function FloatingIcons() {
 
   return <div className="absolute inset-0 overflow-hidden pointer-events-none">{icons}</div>
 }
-

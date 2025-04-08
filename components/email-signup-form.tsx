@@ -31,7 +31,7 @@ export function EmailSignupForm() {
     setIsSubmitting(true)
 
     try {
-      // Call the Cloudflare Function
+      // Call the API route
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: {
@@ -122,4 +122,3 @@ export function EmailSignupForm() {
     </div>
   )
 }
-

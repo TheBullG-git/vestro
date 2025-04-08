@@ -20,4 +20,3 @@ export async function saveEmail(email: string) {
     }
   }
 }
-
