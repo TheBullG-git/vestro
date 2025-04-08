@@ -80,7 +80,6 @@ export default function CancellationAndRefund() {
         <li>Email: support@vestrocloud.com</li>
         <li>Support Ticket: Submit a ticket through your account dashboard</li>
         <li>Live Chat: Available on our website during business hours</li>
-        <li>Phone: +1 (800) 123-4567, Monday to Friday, 9 AM to 6 PM EST</li>
       </ul>
       <p>
         Please include your account information when requesting a refund. Our team will process your request promptly.
