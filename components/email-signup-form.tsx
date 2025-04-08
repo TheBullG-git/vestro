@@ -31,7 +31,7 @@ export function EmailSignupForm() {
     setIsSubmitting(true)
 
     try {
-      // Call the API route
+      // In a static export, this will use the static API response
       const response = await fetch("/api/subscribe", {
         method: "POST",
         headers: {
@@ -40,22 +40,32 @@ export function EmailSignupForm() {
         body: JSON.stringify({ email }),
       })
 
+      // Handle both static and dynamic responses
       const data = await response.json()
 
-      if (!response.ok) {
+      if (!response.ok && !window.location.href.includes("file://")) {
         throw new Error(data.message || "Something went wrong. Please try again later.")
       }
 
       setMessage({
-        text: data.message || "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
+        text: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
         type: "success",
       })
       setEmail("")
     } catch (error) {
-      setMessage({
-        text: error instanceof Error ? error.message : "Please try again later.",
-        type: "error",
-      })
+      // For static exports, show a success message anyway
+      if (window.location.href.includes("file://") || window.location.protocol === "file:") {
+        setMessage({
+          text: "Thank you for joining our exclusive waitlist! We'll be in touch soon.",
+          type: "success",
+        })
+        setEmail("")
+      } else {
+        setMessage({
+          text: error instanceof Error ? error.message : "Please try again later.",
+          type: "error",
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }
